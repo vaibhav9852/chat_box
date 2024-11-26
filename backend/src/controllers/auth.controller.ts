@@ -4,7 +4,13 @@ import {comparePassword,generateToken,hashPassword} from '../utils/auth.util'
 
 export const signup = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
+  // if user exist then return false 
+  // esle check valid field 
   try{
+    let findUser = await authService.findUserByEmail(email)
+    if(findUser){
+     res.status(401).json({ error: 'User already exist' });
+    }
   const hashedPassword = await hashPassword(password);
     console.log('after hasPass',name,email,password)
   const user = await authService.createUser({ name, email, password: hashedPassword }); 
@@ -16,6 +22,7 @@ export const signup = async (req: Request, res: Response) => {
     res.status(500).json({success:false, message:'Internal server error while signup' });
   }
 };
+
 
 
 export const login = async (req: Request, res: Response):Promise<String|any> => {
