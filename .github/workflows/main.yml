@@ -21,7 +21,6 @@ jobs:
         working-directory: ./frontend
         run: npm run build
       - name: Deploy to Netlify
-        needs: Build Frontend
         run: |
           npm install -g netlify-cli
           netlify deploy --prod --dir=frontend/build --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}  # Deploy to Netlify
