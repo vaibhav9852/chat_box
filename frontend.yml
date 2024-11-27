@@ -12,25 +12,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
+          node-version: '20.x'
           cache: 'npm'
       - name: Install Dependencies
         run: npm ci
-        working-directory: ./client
+        working-directory: ./frontend
       - name: Build Frontend
-        working-directory: ./client
+        working-directory: ./frontend
         run: npm run build
       - name: Deploy to Netlify
         needs: Build Frontend
         run: |
           npm install -g netlify-cli
-          netlify deploy --prod --dir=client/build --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}  # Deploy to Netlify
+          netlify deploy --prod --dir=frontend/build --auth ${{ secrets.NETLIFY_AUTH_TOKEN }} --site ${{ secrets.NETLIFY_SITE_ID }}  # Deploy to Netlify
 
 
 
-#  secrets.NETLIFY_AUTH_TOKEN
 
-#  secrets.NETLIFY_SITE_ID 
 
 
 
