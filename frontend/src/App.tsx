@@ -86,7 +86,7 @@ function App() {
          Login with GitHub
        </button>
      </div> */}
-     <h2>Home Page</h2> 
+     <h2>Welcome</h2> 
    </>
  );
 }
