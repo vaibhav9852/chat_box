@@ -13,24 +13,42 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-  messages  message[]
-  @@map("user")
-} 
-
-model message {
-  id          String @id @default(uuid())
-  chat        String
-  senderId    String 
-  reciverId   String
-  author      user   @relation(fields: [userId], references: [id])
-  userId       String
+model User {
+  id         String    @id @default(uuid())
+  name       String
+  email      String    @unique
+  password   String    
+  avatar     String?   
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  messages   Message[] // Relation to messages sent by the user
+  groups     Group[]   @relation("GroupMembers")
+  groupChats Group[]   @relation("GroupAdmins")
 }
+
+model Group {
+  id         String    @id @default(uuid())
+  name       String     
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  adminId    String 
+  admin      User      @relation("GroupAdmins", fields: [adminId], references: [id])
+  members    User[]    @relation("GroupMembers")
+  messages   Message[] // Relation to group messages
+}
+
+model Message {
+  id        String    @id @default(uuid())
+  content   String?   
+  senderId  String   
+  sender    User      @relation(fields: [senderId], references: [id])
+  groupId   String?   
+  group     Group?    @relation(fields: [groupId], references: [id])
+  fileUrl   String?   
+  fileType  String?   // MIME type (e.g., image/jpeg, video/mp4) for media files
+  createdAt DateTime  @default(now())
+}
+
 
 // one to one 
 
