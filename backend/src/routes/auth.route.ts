@@ -7,14 +7,11 @@ router.post('/signup', signup);
 
 router.post('/login', login);
 
-// router.post('/github-login', login);
 router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
 
-// GitHub callback route
 router.get('/github/callback',  passport.authenticate('github', { failureRedirect: '/login' }),
   (req, res) => {
-    console.log('res..',res)
-    res.redirect('/'); // Redirect to the homepage or dashboard after successful login
+    res.redirect('http://localhost:3000/dashboard'); 
   }
 );
 

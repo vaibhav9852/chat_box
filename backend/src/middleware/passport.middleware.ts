@@ -60,7 +60,8 @@
 import passport from 'passport';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import prisma from '../config/prisma';
-
+import authService from '../services/auth.service'
+import { hashPassword } from '../utils/auth.util';
 passport.use(
   new GitHubStrategy(
     {
@@ -70,24 +71,22 @@ passport.use(
     },
     async (accessToken : any, refreshToken : any, profile : any, done : any) => {
       try {
-        // Check if the user already exists in the database
-        // let user = await prisma.user.findUnique({
-        //   where: { email: profile.emails?.[0].value },
-        // });
-       // console.log('user',user)
         console.log('profile',profile)
-        // If the user does not exist, create a new user
-        // if (!user) {
-        //   user = await prisma.user.create({
-        //     data: {
-        //       name: profile.username || 'GitHubUser',
-        //       email: profile.emails?.[0].value || '',
-        //       password: 'github', // Password is not needed for OAuth users
-        //     },
-        //   });
-        // }
-
-        // return done(null, user);
+        
+        let email = profile.username + '@gmail.com'
+        let name =  profile.username
+        let password = profile.nodeId
+        let avatar = profile.photos[0].value
+         console.log('pdata..',{name,email,password,avatar})
+        let user
+        user = await authService.findUserByEmail(email)
+        console.log('find user result', user)
+           if(!user){
+            const hashedPassword = await hashPassword(password);
+             user = await authService.createUser({name,email,password : hashedPassword,avatar})
+           }
+           console.log('create user',user)
+         return done(null, user);
       } catch (error) {
         return done(error, null);
       }

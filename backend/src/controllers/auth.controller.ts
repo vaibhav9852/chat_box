@@ -3,9 +3,8 @@ import authService from '../services/auth.service';
 import {comparePassword,generateToken,hashPassword} from '../utils/auth.util'
 
 export const signup = async (req: Request, res: Response) => {
-  const { name, email, password } = req.body;
-  // if user exist then return false 
-  // esle check valid field 
+  const { name, email, password , avatar} = req.body;
+
   try{
     let findUser = await authService.findUserByEmail(email)
     if(findUser){
@@ -13,7 +12,7 @@ export const signup = async (req: Request, res: Response) => {
     }
   const hashedPassword = await hashPassword(password);
     console.log('after hasPass',name,email,password)
-  const user = await authService.createUser({ name, email, password: hashedPassword }); 
+  const user = await authService.createUser({ name, email, password,avatar }); 
 
   const token = generateToken({ id: user.id });
 

@@ -20,7 +20,7 @@
   "author": "vaibhav",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^6.0.0",
     "@types/cookie-session": "^2.0.49",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.5.1",

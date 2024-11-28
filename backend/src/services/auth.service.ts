@@ -1,16 +1,17 @@
 import prisma from '../config/prisma';
 
 interface UserData {
-  name: string;
-  email: string;
-  password: string;
+  name: string
+  email: string
+  password: string
+  avatar? : string
 }
 
-const createUser = async (data: UserData) => {
+ const createUser = async (data: UserData) => {
   return await prisma.user.create({ data }); 
 };
  
-const findUserByEmail = async (email: string) => {
+ const findUserByEmail = async (email: string) => {
   return  await prisma.user.findUnique({ where: { email } });
 };
 

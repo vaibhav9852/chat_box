@@ -2,12 +2,12 @@ import prisma from "../config/prisma";
 
  interface MessageData {
      
-     content? :  String
-     fileUrl? : String
-     fileType? : String
-     senderId : String 
-     groupId? : String
-     recipientId? : String
+     content? :  string
+     fileUrl? : string
+     fileType? : string
+     senderId : string 
+     groupId? : string
+     recipientId? : string
      
  } 
 
@@ -20,8 +20,8 @@ import prisma from "../config/prisma";
  export const readAllMessage = async (senderId : string,recipientId :string ) =>{
     return await prisma.message.findMany({
         where : {
-           senderId : senderId,
-           recipientId : recipientId
+           senderId  ,
+           recipientId 
           
         }
     })
@@ -29,10 +29,10 @@ import prisma from "../config/prisma";
 
  // read group message 
 
- export const readGroupMessage = async (groupid : string) =>{
+ export const readGroupMessage = async (groupId : string) =>{
     return await prisma.message.findMany({
         where : {
-            groupId :  groupid 
+            groupId :  groupId 
         }
     })
  }

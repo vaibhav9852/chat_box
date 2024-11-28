@@ -1,10 +1,13 @@
-import prisma from "../config/prisma";
 import { Router } from "express";
+import prisma from "../config/prisma";
+import {createGroup , getGroups, getGroup} from "../controllers/group.controller"
 
 const router = Router()
 
-router.post('/create')
+router.post('/create',createGroup)
 
-router.get('/')
+router.get('/',getGroups)
 
-export default router ; 
+router.get('/:groupId',getGroup) 
+
+export default router ;  

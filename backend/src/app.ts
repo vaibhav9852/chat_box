@@ -4,6 +4,7 @@ import cors from 'cors'
 import cookieSession from 'cookie-session'
 import authRoute from './routes/auth.route'
 import messageRoute from './routes/message.route'
+import groupRoute from './routes/group.route'
 import passport from './middleware/passport.middleware'
 // import passport from 'passport'
 // const GitHubStrategy = require('passport-github2').Strategy;
@@ -83,6 +84,7 @@ app.use(passport.session());
 
 app.use('/auth',authRoute)
 app.use('/message',messageRoute)
+app.use('/group', groupRoute)
 app.get('/',(req,res) => {
     res.send('Home Page') 
 })
