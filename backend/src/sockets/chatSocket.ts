@@ -1,17 +1,31 @@
-// import { Server, Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
+import prisma from '../config/prisma';
 
-// export const handleChatSockets = (socket: Socket, io: Server) => {
-//   socket.on('join_chat', (chatId: string) => {
-//     socket.join(chatId);
-//     console.log(`User joined chat: ${chatId}`);
-//   });
+export default (io: Server) => {
+  io.on('connection', (socket: Socket) => {
+    console.log(`User connected: ${socket.id}`);
 
-//   socket.on('send_message', (data: { chatId: string; message: string }) => {
-//     io.to(data.chatId).emit('receive_message', data.message);
-//   });
+    socket.on('join', (roomId: string) => {
+      socket.join(roomId);
+    });
 
-//   socket.on('disconnect', () => {
-//     console.log('User disconnected');
-//   });
-// };
+    socket.on('message', async (data) => {
+      const { content, senderId, recipientId, groupId, fileUrl, fileType } = data;
 
+      // Save message in DB
+      const message = await prisma.message.create({
+        data: { content, senderId,  groupId, fileUrl, fileType },
+      });
+
+      // Broadcast message
+      const roomId = recipientId || groupId;
+      io.to(roomId).emit('message', message);
+    });
+
+    socket.on('disconnect', () => {
+      console.log(`User disconnected: ${socket.id}`);
+    });
+  });
+};
+
+// npx prisma migrate dev --name updated_schema

@@ -2,23 +2,39 @@ import prisma from "../config/prisma";
 
  interface MessageData {
      
-     content :  String
-     fileUrl : String
-     fileType : String
+     content? :  String
+     fileUrl? : String
+     fileType? : String
      senderId : String 
      groupId? : String
-
- }
+     recipientId? : String
+     
+ } 
 
  // create message 
   export  const createMessage = async (data : MessageData) =>{
-  //  return await prisma.message.create({data})
+    return await prisma.message.create({ data })
   }
 
- // read message 
+ // read non group message 
+ export const readAllMessage = async (senderId : string,recipientId :string ) =>{
+    return await prisma.message.findMany({
+        where : {
+           senderId : senderId,
+           recipientId : recipientId
+          
+        }
+    })
+ }
 
- export const readAllMessage = async () =>{
-    return await prisma.message.findMany()
+ // read group message 
+
+ export const readGroupMessage = async (groupid : string) =>{
+    return await prisma.message.findMany({
+        where : {
+            groupId :  groupid 
+        }
+    })
  }
 
  // delete message 

@@ -14,41 +14,44 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(uuid())
-  name       String
-  email      String    @unique
-  password   String    
-  avatar     String?   
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  messages   Message[] // Relation to messages sent by the user
-  groups     Group[]   @relation("GroupMembers")
-  groupChats Group[]   @relation("GroupAdmins")
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String // Hashed password
+  avatar    String? // Profile picture URL
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[] @relation("SentMessages") // Messages sent by this user
+  received  Message[] @relation("DirectMessages") // Messages received by this user
+  groups    Group[]   @relation("GroupMembers") // Groups the user is a part of
+  Group     Group[]
 }
 
 model Group {
-  id         String    @id @default(uuid())
-  name       String     
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  adminId    String 
-  admin      User      @relation("GroupAdmins", fields: [adminId], references: [id])
-  members    User[]    @relation("GroupMembers")
-  messages   Message[] // Relation to group messages
+  id          String    @id @default(uuid())
+  name        String // Group name
+  description String? // Optional description
+  adminId     String // Group admin ID
+  admin       User      @relation(fields: [adminId], references: [id])
+  members     User[]    @relation("GroupMembers")
+  messages    Message[] // Messages sent in the group
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Message {
-  id        String    @id @default(uuid())
-  content   String?   
-  senderId  String   
-  sender    User      @relation(fields: [senderId], references: [id])
-  groupId   String?   
-  group     Group?    @relation(fields: [groupId], references: [id])
-  fileUrl   String?   
-  fileType  String?   // MIME type (e.g., image/jpeg, video/mp4) for media files
-  createdAt DateTime  @default(now())
+  id          String   @id @default(uuid())
+  content     String? 
+  fileUrl     String? // URL for multimedia (image, video, audio)
+  fileType    String? // MIME type of the file
+  senderId    String 
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  recipientId String? // Optional recipient ID for one-to-one messages
+  recipient   User?    @relation("DirectMessages", fields: [recipientId], references: [id])
+  groupId     String? // Optional group ID for group messages
+  group       Group?   @relation(fields: [groupId], references: [id])
+  createdAt   DateTime @default(now())
 }
-
 
 // one to one 
 
@@ -62,9 +65,6 @@ model Message {
 //   user   User @relation(fields: [userId], references: [id])
 //   userId Int  @unique // relation scalar field (used in the `@relation` attribute above)
 // }
-
-
-
 
 // one to many 
 
