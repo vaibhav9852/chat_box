@@ -1,7 +1,8 @@
-import express, { Application } from 'express'
+import express, { Application, urlencoded } from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
 import cookieSession from 'cookie-session'
+import session from 'express-session'
 import authRoute from './routes/auth.route'
 import messageRoute from './routes/message.route'
 import groupRoute from './routes/group.route'
@@ -9,7 +10,7 @@ import passport from './middleware/passport.middleware'
 // import passport from 'passport'
 // const GitHubStrategy = require('passport-github2').Strategy;
 
-const session = require('express-session');
+
 
 dotenv.config()
 
@@ -18,14 +19,15 @@ const app : Application = express()
 app.use(cors({
     origin : '*',
     methods : ['GET','POST','PUT','DELETE'],
-    credentials : true
+    credentials : false
 }))
 
 app.use(express.json())
+app.use(express.urlencoded({extended : true}))
 // Set up session
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: true,
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
   saveUninitialized: true
 }));
 
@@ -83,10 +85,10 @@ app.use(passport.session());
 
 
 app.use('/auth',authRoute)
-app.use('/message',messageRoute)
+app.use('/message' ,messageRoute)
 app.use('/group', groupRoute)
 app.get('/',(req,res) => {
-    res.send('Home Page') 
-})
+  res.json( "Home Page"); 
+}) 
 
-export default app ;
+export default app ; 

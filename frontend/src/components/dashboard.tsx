@@ -4,17 +4,17 @@ import axios from 'axios';
 const Dashboard = () => {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
-    // Fetch user data if authenticated
-    axios.get('http://localhost:8000/api/user')
-      .then(response => {
-        console.log('response',response)
-        setUser(response.data);
-      })
-      .catch(error => {
-        console.error('Not authenticated', error);
-      });
-  }, []);
+
+    useEffect(() => {
+      const queryParams = new URLSearchParams(window.location.search);
+      const userData = queryParams.get('user');
+  
+      if (userData) {
+        setUser(JSON.parse(decodeURIComponent(userData)));
+      }
+    }, []);
+   
+
 
   return (
     <div>
@@ -28,6 +28,7 @@ const Dashboard = () => {
         <h1>Please log in.</h1>
       )} */}
       <h3>Dashboard</h3>
+      <h4>{JSON.stringify(user)}</h4>
     </div>
   );
 };
