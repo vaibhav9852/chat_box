@@ -1,5 +1,4 @@
 import { Router } from "express";
-import prisma from "../config/prisma";
 import {createGroup , getGroups, getGroup} from "../controllers/group.controller"
 
 const router = Router()

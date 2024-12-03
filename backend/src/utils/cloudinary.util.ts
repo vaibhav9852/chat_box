@@ -1,10 +1,9 @@
 const {v2} = require('cloudinary');
-const Hotel = require('../models/hotel.model.js');
-
 
 export async function upload(url : string) {
-    const { CLOUD_NAME , API_KEY, API_SECRET, CLOUDINARY_URL} = process.env
-   
+    const { CLOUD_NAME , API_KEY, API_SECRET} = process.env
+    console.log('CLOUD_NAME , API_KEY, API_SECRET',CLOUD_NAME , API_KEY, API_SECRET)
+    console.log('url',url) 
     v2.config({ 
         cloud_name: CLOUD_NAME, 
         api_key: API_KEY, 
@@ -13,11 +12,15 @@ export async function upload(url : string) {
 
     try{
      const uploadResult = await v2.uploader
-       .upload(
-           `${url}`, 
-       )
+       .upload(  `${url}`, 
+         {
+             resource_type: 'auto',
+            // folder: 'upload'
+         }
+        )
     return  uploadResult.url;
     }catch(error){
+        console.log('upload fail result', error) 
         throw new Error('Cloudinary upload failed');
     }
 }

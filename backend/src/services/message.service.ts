@@ -19,22 +19,56 @@ import prisma from "../config/prisma";
  // read non group message 
  export const readAllMessage = async (senderId : string,recipientId :string ) =>{
     return await prisma.message.findMany({
-        where : {
-           senderId  ,
-           recipientId 
-          
-        }
-    })
+        where: {
+            OR: [
+              { senderId: senderId, recipientId },
+              { senderId: recipientId, recipientId: senderId },
+            ],
+          },
+          orderBy: { createdAt: 'asc' }, // Order messages by creation time
+        
+    });
  }
 
  // read group message 
 
  export const readGroupMessage = async (groupId : string) =>{
     return await prisma.message.findMany({
-        where : {
-            groupId :  groupId 
-        }
+        where : { groupId  },
+        orderBy: { createdAt: 'asc' },
     })
  }
 
  // delete message 
+
+ /*
+ import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export const fetchMessages = async (userId: string, recipientId?: string, groupId?: string) => {
+  if (recipientId) {
+    // Fetch messages for one-to-one chat
+    return prisma.message.findMany({
+      where: {
+        OR: [
+          { senderId: userId, recipientId },
+          { senderId: recipientId, recipientId: userId },
+        ],
+      },
+      orderBy: { createdAt: 'asc' }, // Order messages by creation time
+    });
+  }
+
+  if (groupId) {
+    // Fetch messages for a group chat
+    return prisma.message.findMany({
+      where: { groupId },
+      orderBy: { createdAt: 'asc' }, // Order messages by creation time
+    });
+  }
+
+  throw new Error('Invalid query parameters.');
+};
+
+ */

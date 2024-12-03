@@ -3,9 +3,9 @@ import prisma from "../config/prisma";
 import { createNewGroup , getAllGroup , getGroupDeatils} from "../services/group.service"
 
 export const createGroup = async (req : Request,res : Response) =>{
-     const {name , adminId, member} = req.body
+     const {name , adminId, memberIds} = req.body
     try{
-        let group = await  createNewGroup({name , adminId, member})
+        let group = await  createNewGroup({name , adminId, memberIds})
                  res.status(200).json({success:true,data:group})
     }catch(error){
         res.status(500).json({success:false,message:'Internal server error while create group'})
