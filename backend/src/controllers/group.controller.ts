@@ -6,7 +6,7 @@ export const createGroup = async (req : Request,res : Response) =>{
      const {name , adminId, memberIds} = req.body
     try{
         let group = await  createNewGroup({name , adminId, memberIds})
-                 res.status(200).json({success:true,data:group})
+                 res.status(201).json({success:true,data:group})
     }catch(error){
         res.status(500).json({success:false,message:'Internal server error while create group'})
     }
