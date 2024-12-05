@@ -4,16 +4,15 @@ import prisma from "../config/prisma";
 interface GroupData{
     name : string
     adminId : string
-    memberIds : string[]
+    members : string[]
 }
 
-export const createNewGroup = async ({name, adminId, memberIds} : GroupData) =>{
+export const createNewGroup = async ({name, adminId, members} : GroupData) =>{
 
     return await prisma.group.create({data:{ 
         name,
         adminId,
-      
-        //  members : { connect : memberIds.map((id) => {{id}})}
+     // members : { connect : members.map((id) => {{id}})}
     }})
 }
 
