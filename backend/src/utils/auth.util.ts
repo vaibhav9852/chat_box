@@ -13,10 +13,15 @@ export const comparePassword = async (password: string, hash: string): Promise<b
   return await bcrypt.compare(password, hash);
 };
 
-export const generateToken = (payload: object): string => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-};
+export const generateToken = (payload: object, time = '1d'): string => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: time});
+}; 
 
-export const verifyToken = (token : string) : Object  => {
-  return jwt.verify(token, JWT_SECRET);
+export const verifyToken =  (token : string) : any  => {
+  try{
+    console.log('verify fun',token , JWT_SECRET) 
+  return   jwt.verify(token, JWT_SECRET);
+  }catch(error){
+    console.log('error on verification...',error)       
+  } 
 };

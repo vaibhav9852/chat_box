@@ -1,0 +1,84 @@
+import { verifyEmail } from 'src/services/userService';
+import React, { useContext } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+// import { verifyEmail } from '../../services/authService';
+import { toast } from 'react-toastify';
+import { login } from  '../../redux/features/authentication/authSlice'
+import { useDispatch } from 'react-redux';
+// Update the type to match the actual response structure
+interface VerifyEmailResponse {
+  success: boolean;
+  data: {
+    id: string;
+    // Remove `email` if it's not part of the response
+  };
+  token: string; 
+}
+
+const VerifyEmail: React.FC = () => {
+  const { token } = useParams<{ token: string }>();
+  const navigate = useNavigate();
+  const dispatch = useDispatch() 
+  //const authCtx = useContext(AuthContext);
+
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
+    if (!token) {
+      toast.error('Invalid or missing token.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+      });
+      return;
+    }
+
+    try {
+    
+      const data: VerifyEmailResponse = await verifyEmail(token); 
+    
+      if (data.success) {
+      //  authCtx.signIn(data.data);
+      dispatch(login(data.token)) 
+        localStorage.setItem('user', JSON.stringify(data.data));
+        localStorage.setItem('token', JSON.stringify(data.token));
+
+        toast.success('Email verified successfully', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+        });
+
+        navigate('/chat');
+      } else {
+        toast.error('Something went wrong while verifying email. Please try again.', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+        });
+      }
+    } catch (error) {
+      console.log('verify emil error',error)
+      toast.error('Something went wrong while verifying email. Please try again.', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+      });
+    }
+  };
+
+  return (
+    <div className="flex justify-center mt-10">
+      <button
+        type="submit"
+        onClick={handleSubmit}
+        className="w-64 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition duration-300"
+      >
+        Verify Email
+      </button>
+    </div>
+  );
+};
+
+export default VerifyEmail;
+
