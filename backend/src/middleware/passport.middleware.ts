@@ -3,8 +3,8 @@
 import passport from 'passport';
 import { Strategy as GitHubStrategy } from 'passport-github2';
 import prisma from '../config/prisma';
-import authService from '../services/auth.service'
-import { hashPassword } from '../utils/auth.util';
+import  {createUser , findOne} from '../services/auth.service' 
+
 
 passport.use(
   new GitHubStrategy(
@@ -23,13 +23,12 @@ passport.use(
         let password = profile.nodeId
         let avatar = profile.photos[0].value
 
-         
+          
         let user
-        user = await authService.findUserByEmail(email)
+        user = await findOne({email})
     
            if(!user){
-            const hashedPassword = await hashPassword(password);
-             user = await authService.createUser({name,email,password : hashedPassword,avatar})
+             user = await createUser({name,email,password,avatar})
              console.log('create user',user)
            }
         
@@ -40,6 +39,7 @@ passport.use(
     }
   )
 );
+ 
 
 // Serialize user for session storage
 passport.serializeUser((user: any, done) => {
