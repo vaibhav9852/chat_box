@@ -1,28 +1,18 @@
 import { forgotPassword } from 'src/services/userService';
 import React, { useState, FormEvent } from 'react';
-//import { forgotPassword } from '../../services/authService'; // Assuming this is a service call
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; 
-
-
-interface ForgotPasswordResponse {
-  success: boolean; 
-  message : string
-}
-
-
+import { ForgotPasswordResponse } from 'src/types';
 
 const ForgotPassword: React.FC = () => {
-  const [email, setEmail] = useState<string>(''); 
+  const [email, setEmail] = useState<string>('');  
   const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault(); 
 
     try { 
-      const data : ForgotPasswordResponse = await forgotPassword({email}) //{success : false}  // await forgotPassword(email);
-       console.log('data forgot password', data) 
-
+      const data : ForgotPasswordResponse = await forgotPassword({email}) 
       if(data.success) {  
         toast.success('Password reset link sent! Check your email.', {
           position: "top-right", 
@@ -39,7 +29,6 @@ const ForgotPassword: React.FC = () => {
       }
       setEmail(''); 
     } catch (error) {
-      console.log('error 2', error) 
       toast.error('Oops! Something went wrong. Please try again.', {
         position: "top-right",
         autoClose: 5000,

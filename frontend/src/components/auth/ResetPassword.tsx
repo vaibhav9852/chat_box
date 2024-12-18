@@ -1,16 +1,11 @@
 import { resetPassword } from 'src/services/userService';
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// import { resetPassword } from '../../services/authService';
 import { toast } from 'react-toastify'; 
 import { isValidPassword } from 'src/utils/validation';
+import { ResetPasswordResponse } from '@/src/types';
 
-
-interface ResetPasswordResponse {  
-  success: boolean; 
-}
-  
-  
+ 
 const ResetPassword: React.FC = () => {
 
   const { token } = useParams<{ token: string }>();
@@ -39,12 +34,12 @@ const ResetPassword: React.FC = () => {
 
     try {
   
-      const data: ResetPasswordResponse = await resetPassword(token,{password})   // call api reset 
-    console.log('reset password res', data) 
+      const data: ResetPasswordResponse = await resetPassword(token,{password})    
+
       if (data.success) { 
         toast.success('Your password has been reset successfully!', {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 5000, 
           hideProgressBar: false,
         });
         setPassword('');
@@ -57,7 +52,7 @@ const ResetPassword: React.FC = () => {
         });
       }
     } catch (error) {
-      console.log('reset password catch block', error) 
+ 
       toast.error('Something went wrong while resetting your password. Please try again.', {
         position: "top-right",
         autoClose: 5000,

@@ -1,25 +1,17 @@
 import { verifyEmail } from 'src/services/userService';
 import React, { useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-// import { verifyEmail } from '../../services/authService';
 import { toast } from 'react-toastify';
 import { login } from  '../../redux/features/authentication/authSlice'
 import { useDispatch } from 'react-redux';
-// Update the type to match the actual response structure
-interface VerifyEmailResponse {
-  success: boolean;
-  data: {
-    id: string;
-    // Remove `email` if it's not part of the response
-  };
-  token: string; 
-}
+import { VerifyEmailResponse } from '@/src/types';
+
+
 
 const VerifyEmail: React.FC = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch() 
-  //const authCtx = useContext(AuthContext);
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -33,12 +25,12 @@ const VerifyEmail: React.FC = () => {
       return;
     }
 
-    try {
-    
+    try { 
+     
       const data: VerifyEmailResponse = await verifyEmail(token); 
     
       if (data.success) {
-      //  authCtx.signIn(data.data);
+
       dispatch(login(data.token)) 
         localStorage.setItem('user', JSON.stringify(data.data));
         localStorage.setItem('token', JSON.stringify(data.token));
@@ -58,7 +50,7 @@ const VerifyEmail: React.FC = () => {
         });
       }
     } catch (error) {
-      console.log('verify emil error',error)
+
       toast.error('Something went wrong while verifying email. Please try again.', {
         position: "top-right",
         autoClose: 5000,
@@ -80,5 +72,5 @@ const VerifyEmail: React.FC = () => {
   );
 };
 
-export default VerifyEmail;
+export default VerifyEmail; 
 
