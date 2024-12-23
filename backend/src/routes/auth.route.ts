@@ -5,7 +5,7 @@ import { upload } from '../middleware/multerUpload.middleware';
  
 const router = express.Router();
 
-router.post('/signup', upload.fields([{name:'file',maxCount:1}]), signup); 
+router.post('/signup', upload.fields([{name:'avatar',maxCount:1}]), signup); 
 
 router.post('/verify-email/:token', verifyEmail); 
 

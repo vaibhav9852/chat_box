@@ -3,30 +3,31 @@ import  { findOne,  updateUser , createUser } from '../services/auth.service';
 import {comparePassword,generateToken,hashPassword,verifyToken} from '../utils/auth.util'
 import { sendEmail } from '../utils/sendEmail';
 import { upload } from '../utils/cloudinary.util';
-import crypto from 'crypto'
+import crypto, { verify } from 'crypto'
 import { Prisma } from '@prisma/client';
 
-export const signup = async (req: Request, res: Response) => {
-  const { name, email, password , avatar} = req.body;
-  //  let data = // req.files  
-  //  let avatar ;
-  //  if(data.file){
-  //     avatar =  upload(data)
-  //  } 
- 
+export const signup = async (req: any, res: Response) => {
+  const { name, email, password } = req.body;
+    let data =  req.files 
+    let avatar ; 
+    if(data.avatar){ 
+      avatar  = await  upload(data.avatar[0].path)
+   
+     }   
+
  const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000" 
   try{
-    let findUser = await findOne({email}) //  findUserByEmail(email)
+    let findUser = await findOne({email})  //  findUserByEmail(email)
 
     if(findUser && findUser.verified){
      res.status(401).json({success:false , error: 'User already exist and verify' });
     }
-    let user
-   if(!findUser){
+    let user 
+   if(!findUser){  
 user  = await createUser({ name, email, password  ,avatar }); 
-   }else{
-    user = findUser
-   }
+   }else{  
+    user = findUser 
+   }   
   const token = generateToken({ id: user.id });
   const updatedUser = await updateUser(user.id,{verifyToken : token})
 
@@ -46,7 +47,6 @@ user  = await createUser({ name, email, password  ,avatar });
         }
 //  res.status(201).json({success:true,data:{id:user.id,name:user.name,email:user.email,avatar:user.avatar},token });
   }catch(error){
-    console.log('signup error',error)
     res.status(500).json({success:false, message:'Internal server error while signup' });
   }
 };
@@ -54,7 +54,6 @@ user  = await createUser({ name, email, password  ,avatar });
 
 export const login = async (req: Request, res: Response):Promise<String|any> => {
   const { email, password } = req.body;
-  console.log('hit login', { email, password })
  try{ 
   const user = await findOne({email}); 
   if (!user || !(await comparePassword(password, user.password)) || !user.verified) {
@@ -70,27 +69,21 @@ export const login = async (req: Request, res: Response):Promise<String|any> => 
 
 export const githubLogin = async (req : Request,res : Response) =>{
     
-    const user = req.user as any;
-    const token = generateToken({id : user.id})
-    console.log('genrate token with',user.id,token)  
+    let user = req.user as any;
+    const token = generateToken({id : user.id}) 
+     user = await updateUser(user.id,{ verified : true}) 
+  
 const userData = encodeURIComponent(JSON.stringify({id:user.id,name:user.name,email:user.email,avatar:user.avatar,token}));
   res.redirect(`http://localhost:3000/login?user=${userData}`);
 }
 
-
-
-      
-
 export const verifyEmail = async (req : Request, res : Response)   =>  {
-  const { token } = req.params;  
- 
+  const { token } = req.params;   
   try {
-    const decoded : any  =   verifyToken(token)     //jwt.verify(token, JWT_SECRET);
-    console.log('decode..',decoded) 
+    const decoded : any  =   verifyToken(token)     
     const user : any = await findOne({id:decoded.id})
   
     if (!user) {
-
       res.status(400).json({ message: 'User not found' });
     }
 
@@ -101,7 +94,7 @@ export const verifyEmail = async (req : Request, res : Response)   =>  {
     const updatedUser = await updateUser(user.id,{verified : true , verifyToken : '123'})
     const newToken = generateToken({id:user.id})
     res.status(200).json({ success: true, data: { name: user.name, email: user.email, verified: user.verified, id: user.id },token : newToken });
-  } catch (error) {
+  } catch (error) { 
  
     res.status(400).json({ success: false, message: 'Invalid or expired token' });
   }
@@ -138,15 +131,12 @@ const resetUrl = `${origin}/reset-password/${resetToken}`;
           res.status(200).json({success:true, message: 'Email send' });
         
         }catch(error){
-          console.log('error2',error) 
+      
           await  updateUser(user.id ,{resetPasswordToken : null,resetPasswordExpire : null})
             res.status(500).json({success:false,message:'Internal server error while forgot password ',error})
         }
-
-  
-
+           
      }catch(error){
-      console.log('while update user',error)
         res.status(500).json({success:false,message:'Internal server error while forgot password ',error})
      }
 }
@@ -156,11 +146,11 @@ export const resetPassword = async (req : Request,res : Response) : Promise<any>
     try{
         let {token} = req.params   
         let {password} = req.body 
-       console.log('token and password',token,password)
+   
         const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
-        console.log('resetPasswordToken after token debug',resetPasswordToken)
+      
         const user = await findOne( {  resetPasswordToken, resetPasswordExpire: { gt: new Date() } })
-         console.log('find user', user)
+    
         if (!user) return res.status(400).json({success:false, message: 'Invalid or expired token' });
       
          const hashedPassword = await hashPassword(password) 
@@ -168,8 +158,10 @@ export const resetPassword = async (req : Request,res : Response) : Promise<any>
         res.status(200).json({ success:true,message: 'Password reset successfully' });
 
     }catch(error){
-      console.log('error reset password ', error) 
+   
        res.status(500).json({success:false,message:'Internal server error while forgot password '})
     }
 }
+
+
 
