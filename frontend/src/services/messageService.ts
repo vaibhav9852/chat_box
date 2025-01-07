@@ -1,18 +1,13 @@
 import axios from "axios"
 import { URL } from "../config/apiConfig"
+import axiosInstance from "../config/api"
 
-let token =  localStorage.getItem('token')
-console.log('set token',token) 
-if(token){
-  token = JSON.parse(token)
-}
 export const sendMessage = async (formData : FormData ) =>{
-  let  response = await axios.post(`${URL}/message`,
-    formData,   
+  let  response = await axiosInstance.post(`${URL}/message`,
+    formData,    
     {
       headers: { 
         "Content-Type": "multipart/form-data" ,
-        "Authorization":  `Bearer ${token}` 
       },
 
     }  
@@ -20,16 +15,11 @@ export const sendMessage = async (formData : FormData ) =>{
   return response.data  
 }
   
-export const fetchMessages = async (id:string) =>{
+export const fetchMessages = async (id:string) =>{ 
   if(id){
- let {data} =  await axios.get(`${URL}/message/${id}`,{
-  headers :{
-    "Authorization":  `Bearer ${token}` 
-  }
- }) 
+ let {data} =  await axios.get(`${URL}/message/${id}`) 
  return data
   }
 }
-     
-//   message/:recipientId  
+
 

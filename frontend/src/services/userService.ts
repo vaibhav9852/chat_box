@@ -1,13 +1,11 @@
 import axios from "axios";
 import { URL } from "../config/apiConfig";
+import axiosInstance from "../config/api";
 
-let token = localStorage.getItem('token')
-if(token)
-  token = JSON.parse(token)
 
 export const loginUser   = async (credentials: { email: string; password: string }) => {
-  const response = await axios.post(`${URL}/auth/login`, credentials);
-  return response.data;
+  const response = await axiosInstance.post(`/auth/login`, credentials);
+  return response.data; 
 };
 
 export const signup = async (userData: { name: string; email: string; password: string }) => {
@@ -22,8 +20,8 @@ export const verifyEmail = async (token : string) =>{
 }
 
 export const logout = async () => {
-  await axios.post(`${URL}/auth/logout`);
-};
+  await axiosInstance.post(`/auth/logout`);
+}; 
 
 
 export const forgotPassword = async (data:object) =>{
@@ -33,46 +31,35 @@ export const forgotPassword = async (data:object) =>{
 
 export const resetPassword = async (token:string,data:object) => {
   const response = await axios.post(`${URL}/auth/reset-password/${token}`,data)
-  console.log('response resetPassword', response) 
+  console.log('response resetPassword', response)   
   return response.data  
 }
 
 export const githubLogin = async () =>{
-  const response = await axios.get(`${URL}/auth/github`)
+  const response = await axiosInstance.get(`/auth/github`) 
   return response.data   
 }  
  
 export const getUsers = async () =>{ 
-  return    await axios.get(`${URL}/users`,
-    {
-      headers: { 
-        "Authorization":  `Bearer ${token}` 
-      },
-  }
-  )  
- }
+  return    await axiosInstance.get(`/users`)  
+ }  
  
  export const getUser = async (id : string | undefined) =>{
- return await axios.get(`${URL}/users/${id}`,
-  {
-    headers: { 
-      "Authorization":  `Bearer ${token}` 
-    },
-}
- )   
+ return await axiosInstance.get(`/users/${id}`)    
  } 
 
-export const editUser =  async (id:string) =>{
-  const response = await axios.patch(`${URL}/users/${id}`,
-    {
+export const editUser =  async (id:string | undefined , formData : FormData) =>{
+  const response = await axiosInstance.patch(`/users/${id}`, formData , 
+    { 
       headers: { 
-        "Authorization":  `Bearer ${token}` 
+       "Content-Type": "multipart/form-data"  
       },
-  }
-  )
-  return response.data 
+  } 
+  ) 
+  return response.data     
 }
 
 
 
 
+ 
