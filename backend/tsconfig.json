@@ -155,7 +155,7 @@
 // }
 
 {
-  "exclude": ["./coverage", "./dist", "__tests__", "jest.config.js"],
+  "exclude": ["./coverage", "./dist", "jest.config.js"],
   "ts-node": {
     "transpileOnly": true,
     "files": true
@@ -163,14 +163,14 @@
   "compilerOptions": {
     "target": "es2016",
     "module": "commonjs",
-    "rootDir": "./src",
-    "moduleResolution": "node",
+    "rootDirs": ["./src","../*"],  
+    "moduleResolution": "node", 
     "checkJs": true,
     "outDir": "./dist",  
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true, 
     "strict": true,
-    "noImplicitAny": true,
-    "skipLibCheck": true
+    "noImplicitAny": true, 
+    "skipLibCheck": true,
   }
 }

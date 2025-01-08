@@ -15,8 +15,8 @@ import prisma from "../config/prisma";
   export  const createMessage = async (data : MessageData) =>{
     return await prisma.message.create({ data })
   }
-
- // read non group message 
+ 
+ // read non group message  
  export const readAllMessage = async (senderId : string,recipientId :string ) =>{
     return await prisma.message.findMany({
         where: {
@@ -35,9 +35,16 @@ import prisma from "../config/prisma";
  export const readGroupMessage = async (groupId : string) =>{
     return await prisma.message.findMany({
         where : { groupId  },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: 'asc' },  
     })
- }
+ }  
+  
+//  export const readGroupMessage = async (groupId : string) => {
+//     return await prisma.message.findMany({
+//        where : { groupId} ,
+//        orderBy : { createAt : 'asc'}
+//     })
+//  }
 
  // delete message 
 
