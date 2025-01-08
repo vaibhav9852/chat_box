@@ -1,64 +1,73 @@
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { useReactMediaRecorder } from "react-media-recorder";
 import { SelectedItem } from "src/types"; 
 import { useQuery } from "@tanstack/react-query"; 
 import axios from "axios";
 import List from "./List";
 import Message from "./Message";  
-import { fetchGroupMessage  } from "src/services/groupService";
+import { deleteGroup, exitGroup, fetchGroupMessage  } from "src/services/groupService";
 import { fetchMessages, sendMessage } from "src/services/messageService";
 import { useSelector } from "react-redux";
-import { Rootstate } from "src/redux/store";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
- 
- 
-const ChatBox: React.FC = () => {
-  const [message, setMessage] = useState<string>("");
-  const [recording, setRecording] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [newGroupOption, setNewGroupOption] = useState(false); 
+import { Rootstate } from "src/redux/store"; 
+import { Link, useNavigate } from "react-router-dom";  
+import { toast } from "react-toastify"; 
+import { useDispatch } from "react-redux";  
+import { setDeleteGroupId, setExitGroupId } from "src/redux/features/chat/chatSlice"; 
+
+const ChatBox: React.FC = () => { 
+  const [message, setMessage] = useState<string>("");  
+  const [recording, setRecording] = useState<boolean>(false); 
+  const [selectedItem, setSelectedItem] = useState<SelectedItem | null>(null); 
+  const [file, setFile] = useState<File | null>(null);  
+  const [isUploading, setIsUploading] = useState(false); 
+  const [dropdownOpen, setDropdownOpen] = useState(false); 
+  const [newGroupOption, setNewGroupOption] = useState(false);   
   const [groupOption , setGroupOption] = useState(false)
+  const [groupStatus,setGroupStatus] = useState(false)  
 
   //const {data , status: messageStatus}  = useQuery({queryKey:["messages"], queryFn :()=> fetchMessages(selectedItem.id)})
-   const dropdownRef = useRef<HTMLDivElement>(null) 
+   
+  const dropdownRef = useRef<HTMLDivElement>(null) 
    const groupRef = useRef<HTMLDivElement>(null)  
    const messageEndRef = useRef<HTMLDivElement>(null) 
-   const loginUser = useSelector((state : Rootstate ) => state.auth.loginUser)  
-  
+   const loginUser = useSelector((state : Rootstate ) => state.auth.loginUser)   
+   const navigate = useNavigate()     
+   const dispatch = useDispatch()    
+
    const { status, startRecording, stopRecording, mediaBlobUrl } =
     useReactMediaRecorder({ 
       audio: true, 
       onStop: async (blobUrl: string, blob: Blob) => {
-        
+      
       },  
     });   
-    
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0]); 
-    } 
-  };
-     
+      setFile(e.target.files[e.target.files.length-1]);   
+    }  
+  }; 
+
   const handleSend = async () => {
     if (!selectedItem) {
-      alert("Please select a user or group to send a message.");
       return; 
     }
-
-    setIsUploading(true);
+    if (file && mediaBlobUrl) {
+      toast.error("You can only send either a file or a recorded audio.");
+      return;
+    }  
+  
     const formData = new FormData(); 
     
     if (mediaBlobUrl) {
+      setIsUploading(true);
       const audioBlob = await fetch(mediaBlobUrl).then((res) => res.blob()); 
       formData.append("file", audioBlob, "recording.wav");
-    }
+    } 
 
-    if (file) {
+    if (file) { 
+      setIsUploading(true);
       formData.append("file", file);
     }
 
@@ -69,11 +78,9 @@ const ChatBox: React.FC = () => {
     const senderId = loginUser.id; 
     const recipientId = selectedItem.id;
     if(selectedItem.adminId){ 
-      alert('set groupId')
       formData.append("groupId", selectedItem.id);
      
     }else{
-      alert('set recipientId') 
       formData.append("recipientId",recipientId);
     }
     formData.append("senderId", senderId);
@@ -81,7 +88,6 @@ const ChatBox: React.FC = () => {
 
     try { 
        let data = await  sendMessage(formData)
-      alert("Message sent!");
       resetInputs(); 
     } catch (error) {
      
@@ -89,14 +95,14 @@ const ChatBox: React.FC = () => {
          position : "top-right",
       })
     } finally {
-      setIsUploading(false);
+      setIsUploading(false); 
     }
   };
       
   const resetInputs = () => {
     setFile(null);
-    setMessage("");
-  };
+    setMessage(""); 
+  }; 
 
  const handleClickOutside = (event : MouseEvent) =>{
    if(dropdownRef.current &&  !dropdownRef.current.contains(event.target as Node)){
@@ -108,21 +114,39 @@ const ChatBox: React.FC = () => {
    if(groupRef.current && !groupRef.current.contains(event.target as Node)){
     setGroupOption(false)       
    }
- } 
- 
+ }  
+                
  const handleExit = async () =>{ 
   try{
-   // const response = await exitGroup(selectedItem?.id)
-    alert('exit') 
-  }catch(error){
-    toast.error('Error while exit group')
+    const response = await exitGroup(selectedItem?.id)
+    alert('exit')  
+    setGroupOption(false)
+    if( selectedItem?.id){
+      dispatch(setExitGroupId(selectedItem.id)) 
+      }
+    navigate('/chat') 
+    setSelectedItem(null)    
+  }catch(error){ 
+    toast.error('Error while exit group') 
   }
  }
  
- const handleDelete = async ()=>{
-  alert('delete')
- }
-
+ const handleDelete = async (event : FormEvent)=>{
+  event.preventDefault();
+  try{
+    const response = await deleteGroup(selectedItem?.id)
+    setGroupOption(false) 
+   if( selectedItem?.id){ 
+   dispatch(setDeleteGroupId(selectedItem.id))  
+   }
+    navigate('/chat') 
+    setSelectedItem(null) 
+    alert('deleted')    
+  }catch(error){  
+    toast.error('Error while exit group') 
+  }
+ } 
+ 
  useEffect(()=> {
     document.addEventListener('mousedown',handleClickOutside)
   return ()=>{
@@ -134,19 +158,27 @@ const ChatBox: React.FC = () => {
 
 useEffect(()=>{
    document.addEventListener('mousedown',handleClickOutsideGroupRef)
-
    return () => {
     document.addEventListener('mousedown',handleClickOutsideGroupRef)
    }
-})
+},[])
 
 useEffect(()=>{
    if(messageEndRef.current){
     messageEndRef.current.scrollIntoView({ behavior: "smooth" }); 
    }
-},[selectedItem?.id])     
+  if(selectedItem?.adminId){
+    console.log('selectedItem..',selectedItem) 
+ const users = selectedItem?.members?.filter((user:any) => user.userId == loginUser.id)
+ if(users && users.length){
+ setGroupStatus(users[0]?.active)  
+ }
+}else{
+  setGroupStatus(true)  
+}
+},[selectedItem?.id, groupStatus])     
 
-  return (
+  return ( 
     <div className="flex h-screen bg-gray-100">
       {/* Left Sidebar */}
       <div className="w-1/4 bg-white shadow-md p-4 ">  
@@ -158,7 +190,7 @@ useEffect(()=>{
             </div>
             {dropdownOpen && ( 
                 <div className="absolute  left-24 mt-8 w-40 h-10 bg-white text-gray-700 rounded-md shadow-lg">
-                <Link to="/create-group" className="block px-4 py-2 hover:bg-gray-100" >
+                <Link to={`/create-group/${loginUser?.id}`} className="block px-4 py-2 hover:bg-gray-100" >
                     New group  
                   </Link>  
                 </div> 
@@ -166,23 +198,24 @@ useEffect(()=>{
            </div> 
 
         <List onSelect={(item: SelectedItem) => setSelectedItem(item)} />
-      </div> 
-       
-      {/* Chat Area */}     
-      <div className="flex flex-col w-3/4"> 
+      </div>  
+
+     {/* Chat Area */}      
+      <div className="flex flex-col w-3/4">  
         <div className="flex items-center space-x-4 p-4 bg-white shadow-md">
-          {selectedItem ? (
-            <>
-              {selectedItem.avatar ? ( 
+          {selectedItem ? ( 
+          
+            <> 
+              {selectedItem.avatar ? (  
                 <img
                   src={selectedItem.avatar}
-                  alt={`${selectedItem.name}'s avatar`}
+                  alt={`${selectedItem.name}'s avatar`} 
                   className="w-10 h-10 rounded-full"
                 />
               ) : (
-                <div className="w-10 h-10 flex items-center justify-center bg-gray-400 text-white rounded-full">
-                  {selectedItem.name.charAt(0).toUpperCase()}
-                </div>
+                <div className="w-12 h-10 flex items-center justify-center bg-gray-400 text-white rounded-full">
+                  {selectedItem.name.charAt(0).toUpperCase()} 
+                </div> 
               )}
               <h2 className="text-lg font-bold">{selectedItem.name}</h2>
            {selectedItem.adminId &&    <div className="flex w-full justify-end  text-2xl font-bold" ref={groupRef}>
@@ -192,8 +225,10 @@ useEffect(()=>{
             {groupOption && (  
                 <div className="absolute flex  right-14 p-4  w-52 h-auto bg-white text-gray-700 rounded-md shadow-lg" ref={groupRef} >
                  <div className="flex flex-col ml-2  text-red-500 ">
-                <button onClick={() => handleExit()}>Exit</button> 
-                <button onClick={() => handleDelete()}>Delete</button> 
+                  {
+             groupStatus == true ?   <button onClick={() => handleExit()}>Exit</button> 
+               : <button onClick={(event) => handleDelete(event)}>Delete</button>  
+                  } 
                 </div>
                 </div>  
               ) }                                                          
@@ -212,20 +247,20 @@ useEffect(()=>{
       
         </div>
        
-        <div className="p-6 bg-gray-50 rounded-lg shadow-lg flex items-center gap-4">
-  <div className="flex items-center gap-3">
+     { ( groupStatus && selectedItem?.id) &&   <div className="p-6 bg-gray-50 rounded-lg shadow-lg flex items-center gap-4">
+   <div className="flex items-center gap-3">
     <label className="text-gray-600  text-4xl cursor-pointer hover:text-gray-900 ">
       +
-      <input
+      <input 
       type="file"
-      onChange={handleFileChange}
-      accept="audio/*,video/*,image/*"
+      onChange={handleFileChange}   
+      accept="audio/*,video/*,image/*"   
       className="hidden" 
-    /> 
-    </label>
-  </div>
-  
-  {/* Message Input */} 
+    />   
+    </label>      
+  </div>    
+     
+  {/* Message Input */}  
 
   <textarea
     value={message}
@@ -242,7 +277,7 @@ useEffect(()=>{
       >
         Stop
       </button>
-    ) : (
+    ) : ( 
       <button
         onClick={startRecording} 
         className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none transition duration-300"
@@ -250,7 +285,7 @@ useEffect(()=>{
         🎙️ Record
       </button>
     )}
-
+                 
     <button
       onClick={handleSend}
       disabled={isUploading || (!mediaBlobUrl && !file && !message.trim())}
@@ -261,18 +296,19 @@ useEffect(()=>{
       {isUploading ? "Uploading..." : "Send"}
     </button>
   </div>
-</div>
- {mediaBlobUrl && ( 
+</div> } 
+ {mediaBlobUrl && (  
           <audio controls className=" w-56 h-5 m-1"> 
             <source src={mediaBlobUrl} type="audio/wav" />
             Your browser does not support the audio element.
           </audio> 
         )}    
 {file && <p className="ml-2 p-1">{file.name}</p>} 
-      </div>
+      </div> 
     </div>
-  );
+  ); 
 }; 
+ 
 
-export default ChatBox;  
+export default ChatBox;     
 

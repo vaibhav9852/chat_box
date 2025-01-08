@@ -7,22 +7,21 @@ import { useDispatch } from 'react-redux';
 import { VerifyEmailResponse } from '@/src/types';
 
 
-
 const VerifyEmail: React.FC = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch() 
+  const dispatch = useDispatch()  
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (!token) {
+    if (!token) { 
       toast.error('Invalid or missing token.', {
-        position: "top-right",
-        autoClose: 5000,
+        position: "top-right", 
+        autoClose: 5000,      
         hideProgressBar: false,
-      });
-      return;
+      });                      
+      return;                  
     }
 
     try { 

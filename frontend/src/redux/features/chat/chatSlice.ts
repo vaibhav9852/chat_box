@@ -1,18 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {recipientId:"",loginUser:""}
-//  recipientId
+const initialState = {userAndGroupList:[],deleteGroupId:'',exitGroupId:''}
+
 const chatSlice = createSlice({
-    name:"chatSlice",
+    name:"chatSlice", 
     initialState : initialState,
     reducers : {
-        handleRecipient(state,action){
-           state.recipientId = action.payload
+        handleUserAndGroupList(state,action){
+           state.userAndGroupList = action.payload
+        } ,
+        setDeleteGroupId(state,action){
+            state.deleteGroupId = action.payload
+        },
+        setExitGroupId(state,action){
+            state.exitGroupId = action.payload 
         }
-
     }
-})
-
-export const {  handleRecipient } = chatSlice.actions
-
-export default chatSlice.reducer
+}) 
+ 
+export const { handleUserAndGroupList , setDeleteGroupId ,setExitGroupId } = chatSlice.actions
+export default chatSlice.reducer   

@@ -7,7 +7,7 @@ import { Rootstate } from 'src/redux/store';
 const Navbar: React.FC = () => { 
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+// const [mobileMenuOpen, setMobileMenuOpen] = useState(false);     
   const dropdownRef = useRef<HTMLDivElement>(null); 
   const dispatch = useDispatch()    
   const loginUser  = useSelector((state : Rootstate) => state.auth.loginUser)
@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
     }
   };
   console.log('login user', loginUser) 
-
+  
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -39,9 +39,9 @@ const Navbar: React.FC = () => {
           ChatApp
         </Link>
 
-        {/* Hamburger Menu (Mobile) */}
-        <button
-          className="md:hidden"
+       
+        {/* <button 
+          className="md:hidden "
           onClick={() => setMobileMenuOpen((prev) => !prev)}
           aria-label="Toggle Menu"
         >
@@ -54,22 +54,18 @@ const Navbar: React.FC = () => {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
           </svg>
-        </button>
+        </button> */}
 
         {/* Links & Dropdown */}
-        <div
-          className={`${
-            mobileMenuOpen ? 'block' : 'hidden'
-          } md:flex md:items-center space-y-4 md:space-y-0 md:space-x-6`}
-        >
-          {isAuthenticated ? ( 
+        <div>
+          {isAuthenticated ? (  
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen((prev) => !prev)}  
                 aria-expanded={dropdownOpen} 
                 className="flex items-center space-x-2 px-4 py-2 bg-cyan-500 rounded-full "
               >
-                <span>{loginUser.name}</span>
+                <span>{loginUser?.name}</span>
                 <svg 
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -87,7 +83,7 @@ const Navbar: React.FC = () => {
               </button>
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-gray-700 rounded-md shadow-lg">
-              { isAuthenticated &&    <Link to={`/profile/${loginUser.id}`} className="block px-4 py-2 hover:bg-gray-100" >
+              { isAuthenticated &&    <Link to={`/profile/${loginUser?.id}`} className="block px-4 py-2 hover:bg-gray-100" >
                     Profile
                   </Link> }
              {  isAuthenticated && <button  onClick={handleLogout}  className="block w-full text-left px-4 py-2 hover:bg-gray-100" >

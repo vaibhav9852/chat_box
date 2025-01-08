@@ -1,35 +1,47 @@
 import axios from "axios"
 import React, { useEffect, useState } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { isValidEmail, isValidPassword } from "../../utils/validation"
 import { toast } from "react-toastify"
 import { URL } from "../../config/apiConfig"
 import { Link, useNavigate } from "react-router-dom"
 import { githubLogin, loginUser } from "src/services/userService"
  import {login} from "../../redux/features/authentication/authSlice"
+import { Rootstate } from "src/redux/store"
 
-const Login = () =>{
+const Login = () =>{ 
   
     const [user,setUser] = useState({email:'',password:''})     
-    const [loading,setLoading] = useState(false)
+    const [loading,setLoading] = useState(false) 
     
      const dispatch = useDispatch()
-     const navigate = useNavigate()
+     const isAuthenticated = useSelector((state: Rootstate) => state.auth.isAuthenticated)
+     const navigate = useNavigate() 
 
      const handleChange = (event : React.ChangeEvent<HTMLInputElement> ) =>{
         setUser({...user,[event.target.name] : event.target.value}) 
      }
 
      useEffect(() => {
-       const queryParams = new URLSearchParams(window.location.search);
-       const userData = queryParams.get('user'); 
+       const queryParams = new URLSearchParams(window.location.search); 
+       const userData = queryParams.get('user');     
    
        if (userData) {
          const data = JSON.parse(decodeURIComponent(userData))
-         dispatch(login({token : data.token , user:data})) 
-         navigate('/chat')    
+         if(data.token){
+          localStorage.setItem('token', JSON.stringify(data.token));
+          dispatch(login({token : data.token , user:data}))
+          toast.success('Login successful !',{
+            position : 'top-right',
+            autoClose : 5000, 
+            hideProgressBar : false 
+          }) 
+            navigate('/chat')   
+          
+         }   
        }   
-     }, [loading]);        
+     }, [loading]);    
+     
       
      const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
         event.preventDefault() 
@@ -43,6 +55,7 @@ const Login = () =>{
                 hideProgressBar: false, 
             }); 
         }else if(!validEmail){
+          setUser({email:'' , password : user.password}) 
             toast.error('Invalid email', {
                 position: "top-right",
                 autoClose: 5000,
@@ -50,7 +63,8 @@ const Login = () =>{
             });
         }
         else if(!validPassword){
-            toast.error('Invalid password', {
+          setUser({email:user.email , password : ''})
+            toast.error('Password must be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters.', {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -59,14 +73,15 @@ const Login = () =>{
         try{     
             let data = await loginUser(user) 
             if(data.success){
-              localStorage.setItem('token',JSON.stringify(data.token))
-              dispatch(login({token : data.token , user:data.data}))
+              localStorage.setItem('token',JSON.stringify(data.token))  
+              dispatch(login({token : data.token , user:data.data})) 
               toast.success('Login successful !',{
                 position : 'top-right',
-                autoClose : 5000,
+                autoClose : 5000, 
                 hideProgressBar : false
               })  
-              navigate('/chat')
+              setUser({email:'',password:''})
+              navigate('/chat') 
             }
         }catch(error){
          toast.error('Login failed !',{
@@ -77,19 +92,20 @@ const Login = () =>{
         }
       
         }
-        setUser({email:'',password:''})
+       
         setLoading(false)  
      }
 
      const handleGithubLogin = async (event: React.FormEvent<HTMLElement>) =>{
              event.preventDefault()
+             setLoading(true) 
        try{ 
           const data  = await  githubLogin()  
-       }catch(error){
+       }catch(error){ 
         toast.error('Oops login failed', {
             position: "top-right",
             autoClose: 5000,
-            hideProgressBar: false,
+            hideProgressBar: false, 
         }); 
        }
      }
@@ -134,9 +150,9 @@ const Login = () =>{
             type="submit"
             className="w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Log In
+            Log In 
           </button>
-        </form>
+        </form> 
         <div className="flex items-center justify-between mt-6">
           <hr className="w-full border-gray-300" />
           <span className="px-2 text-sm text-gray-500">OR</span>
@@ -167,6 +183,6 @@ const Login = () =>{
     )
 }
 
-export default Login
+export default Login 
 
  

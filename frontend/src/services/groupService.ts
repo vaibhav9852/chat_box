@@ -2,19 +2,9 @@ import axios from "axios"
 import { URL } from "../config/apiConfig"
 import axiosInstance from "../config/api" 
 
-let token = localStorage.getItem('token')
-
-if(token){
-token = JSON.parse(token) 
-alert('token find') 
-} 
-console.log('token find....', token)
-
 
 export const getUsers = async () =>{     
- return    await axiosInstance.get(`/users`, 
-)  
-    
+ return    await axiosInstance.get(`/users`)     
 } 
  
 export const getUser = async (id : string) =>{ 
@@ -32,19 +22,19 @@ export const createGroup = async (data:object) =>{
 }
 
 export const exitGroup = async (groupId:string | undefined) =>{
-    return await axiosInstance.patch(`${URL}/group/${groupId}/exit`,'x' ) 
+    return await axiosInstance.patch(`/group/${groupId}/exit`,'x' ) 
 }
 
 export const deleteGroup = async (groupId:string | undefined) =>{
-    return await axiosInstance.delete(`${URL}/group/${groupId}` ) 
+    return await axiosInstance.delete(`/group/${groupId}` ) 
 }
 
 
 
 export const fetchGroupMessage = async (id : string) =>{
  
-    let response =  await axiosInstance.get(`${URL}/message/group/${id}` )  
-    return response   
+    let response =  await axiosInstance.get(`/message/group/${id}` )  
+    return response    
 } 
 
 

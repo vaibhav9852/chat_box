@@ -4,18 +4,17 @@ import axiosInstance from "../config/api";
 
 
 export const loginUser   = async (credentials: { email: string; password: string }) => {
-  const response = await axiosInstance.post(`/auth/login`, credentials);
+  const response = await axiosInstance.post(`/auth/login`, credentials); 
   return response.data; 
 };
 
 export const signup = async (userData: { name: string; email: string; password: string }) => {
-  const response = await axios.post(`${URL}/auth/register`, userData);
+  const response = await axiosInstance.post(`/auth/register`, userData);
   return response.data;
 };
 
 export const verifyEmail = async (token : string) =>{
-   const response = await axios.post(`${URL}/auth/verify-email/${token}`)
-   
+   const response = await axiosInstance.post(`/auth/verify-email/${token}`)
    return response.data
 }
 
@@ -25,12 +24,12 @@ export const logout = async () => {
 
 
 export const forgotPassword = async (data:object) =>{
- const response =  await axios.post(`${URL}/auth/forgot-password`,data)   
+ const response =  await axiosInstance.post(`/auth/forgot-password`,data)   
  return response.data 
 } 
 
 export const resetPassword = async (token:string,data:object) => {
-  const response = await axios.post(`${URL}/auth/reset-password/${token}`,data)
+  const response = await axiosInstance.post(`/auth/reset-password/${token}`,data)
   console.log('response resetPassword', response)   
   return response.data  
 }

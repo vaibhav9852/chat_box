@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { isValidPassword } from 'src/utils/validation';
 import { ResetPasswordResponse } from '@/src/types';
 
- 
+
 const ResetPassword: React.FC = () => {
 
   const { token } = useParams<{ token: string }>();
@@ -24,7 +24,8 @@ const ResetPassword: React.FC = () => {
       });
       return;
     }else if(!isValidPassword(password)){
-          toast.error('Invalid password',{
+      setPassword('')
+          toast.error('Password must be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters.',{
             position : "top-right",
             autoClose : 5000,
             hideProgressBar : false 
@@ -84,4 +85,4 @@ const ResetPassword: React.FC = () => {
   );
 };
 
-export default ResetPassword;  
+export default ResetPassword;   

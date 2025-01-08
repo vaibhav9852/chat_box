@@ -1,51 +1,62 @@
 import axios from "axios"
 import React, { useState } from "react"
 
-import { isValidEmail, isValidPassword } from "../../utils/validation"
+import { isValidEmail, isValidPassword , isValidName } from "../../utils/validation"
 import { toast } from "react-toastify" 
 import { URL } from "../../config/apiConfig" 
 import { Link, useNavigate } from "react-router-dom"
 const Signup = () =>{
   
-    const [user,setUser] = useState({name:'',email:'',password:''})
+    const [user,setUser] = useState({name:'',email:'',password:''}) 
     const [profileImage, setProfileImage] = useState<File | null>(null); 
-    const [loading,setLoading] = useState(false) 
+    const [loading,setLoading] = useState(false)   
     
     const navigate = useNavigate()
      const handleChange = (event : React.ChangeEvent<HTMLInputElement> ) =>{
-        setUser({...user,[event.target.name] : event.target.value})
-      
+        setUser({...user,[event.target.name] : event.target.value}) 
      }
 
        const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setProfileImage(event.target.files[0]);
     }
-  };
+  };  
 
      const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         const  validPassword =  isValidPassword(user.password) 
         const validEmail = isValidEmail(user.email)
+        const validName = isValidName(user.name)
         if(!user.email.trim() || !user.password.trim() || !user.name.trim()){
             toast.error('All fields should be required', {
                 position: "top-right",
                 autoClose: 5000,
-                hideProgressBar: false,
+                hideProgressBar: false,  
             });
-        }else if(!validEmail){
+        }else if(!validName){
+          setUser({name:'',email:user.email , password : user.password})
+          toast.error('Name must be at least 4 characters long', {
+            position: "top-right", 
+            autoClose: 5000,
+            hideProgressBar: false,  
+        });
+        }
+        else if(!validEmail){  
+          setUser({name:user.name,email:'',password:user.password})      
             toast.error('Invalid email', {
                 position: "top-right",
                 autoClose: 5000,
-                hideProgressBar: false,
+                hideProgressBar: false, 
             });
         }
-        else if(!validPassword){
-            toast.error('Invalid password', {
+        else if(!validPassword){ 
+          setUser({name:user.name , email:user.email , password :''})
+            toast.error('Password must be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters.', {
                 position: "top-right",
                 autoClose: 5000,
                 hideProgressBar: false,
             });
+        
         }else{ 
       
         try{
@@ -69,7 +80,7 @@ const Signup = () =>{
                 autoClose: 5000,
                 hideProgressBar : false
               })
-             
+              setUser({name: '',email:'',password:''})
             }
         }catch(error){
             toast.error('Error while signup',{
@@ -80,11 +91,9 @@ const Signup = () =>{
         }
       
         }
-        setUser({name: '',email:'',password:''})
+       
         setProfileImage(null)
      }
-
-   
 
     return(
         <>
@@ -109,9 +118,9 @@ const Signup = () =>{
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
+              Email 
             </label>
-            <input
+            <input 
               type="email"
               name="email"
               id="email"
@@ -134,7 +143,7 @@ const Signup = () =>{
               required
               className="w-full mt-2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
-          </div>
+          </div> 
           <div className="mb-6">
              <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">
                Profile Image

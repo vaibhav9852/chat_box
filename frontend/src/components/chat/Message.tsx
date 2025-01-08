@@ -9,11 +9,11 @@ import { useSelector } from "react-redux"
 import { Rootstate } from "src/redux/store"  
 import ShowMedia from "../common/ShowMedia"    
 import socket from "src/config/socket"
-import { fetchGroupMessage } from "src/services/groupService" 
-import { AxiosResponse } from "axios"
-
-
-const Message : React.FC<MessageProps>  = ({item}) =>{  
+import { fetchGroupMessage } from "src/services/groupService"  
+import { AxiosResponse } from "axios" 
+ 
+ 
+const Message : React.FC<MessageProps>  = ({item}) =>{    
      const [messages , setMessages] = useState<Messgae[]>([]) 
      const queryClient = useQueryClient();
 
@@ -23,7 +23,7 @@ const Message : React.FC<MessageProps>  = ({item}) =>{
         queryKey:["messages",item.id],  
         queryFn :()=> fetchMessages(item.id),  
         enabled : !!item.id ,
-         initialData : []
+         initialData : [] 
     })        
              
     const {data : groupData } = useQuery({
@@ -36,10 +36,9 @@ const Message : React.FC<MessageProps>  = ({item}) =>{
              
   useEffect(() => { 
     if (item.adminId) {
-      alert('join room')
       socket.emit("joinRoom", item.id); 
     } else{
-      alert('join login') 
+      alert('socket login') 
      socket.emit('login',item.id) 
     }
   }, [item]);  
@@ -47,18 +46,13 @@ const Message : React.FC<MessageProps>  = ({item}) =>{
   
   useEffect(() => {
     const handleNewMessage = (newMessage: Messgae) => {
-       alert('new msg') 
-      const isGroupMessage =
-        item.adminId && newMessage?.groupId === item.id;
-      const isDirectMessage =
-        !item.adminId && newMessage?.recipientId === item.id;
-      
-      if (newMessage && (isGroupMessage || isDirectMessage)) {
-        alert('match msg')
+      alert('new msg')
+      const isGroupMessage = item.adminId && newMessage?.groupId === item.id;
+      const isDirectMessage = !item.adminId && newMessage?.recipientId === item.id;
+     // setMessages((prev) => [...prev, newMessage]);      
+      if (newMessage && (isGroupMessage || isDirectMessage)) { 
         setMessages((prev) => [...prev, newMessage]);
-      }
-
-    
+      } 
     };
 
     socket.on("newMessage", handleNewMessage);
@@ -66,15 +60,15 @@ const Message : React.FC<MessageProps>  = ({item}) =>{
     return () => {
       socket.off("newMessage", handleNewMessage);
     };
-  }, [item]);
+  }, []); 
 
 
   useEffect(() => { 
     if (data?.data) {
       setMessages(data.data);
-    }
+    } 
   }, [data]); 
-
+ 
   useEffect(() => {
     if (groupData?.data) { 
       setMessages((prev) => {
@@ -83,7 +77,7 @@ const Message : React.FC<MessageProps>  = ({item}) =>{
         return [...prev, ...newMessages];
       });
     }
-  }, [groupData]);  
+  }, [groupData]);     
     
     
      return(     
@@ -97,8 +91,8 @@ const Message : React.FC<MessageProps>  = ({item}) =>{
     <div className={`${message.content ? 'bg-gray-200 text-black p-2 rounded-lg max-w-[80%]' : 'h-auto rounded-md'}`}> 
       {message.content}
       {message.fileUrl && fileType && (
-        <ShowMedia item={{ type: fileType, fileUrl: message.fileUrl }} />
-      )}
+        <ShowMedia item={{ type: fileType, fileUrl: message.fileUrl }} /> 
+      )} 
     </div>
   </div>
             )
@@ -108,7 +102,8 @@ const Message : React.FC<MessageProps>  = ({item}) =>{
                 <div className={`${message.content ? 'bg-green-500 text-black p-2 rounded-lg max-w-[80%]' : ' h-auto rounded-md'} `}>
                   {message.content}
                   {message.fileUrl && fileType && (
-                    <ShowMedia  item={{ type: fileType, fileUrl: message.fileUrl }}  />
+
+                    <ShowMedia   item={{ type: fileType, fileUrl: message.fileUrl }}  />
                   )}
                 </div>
               </div>

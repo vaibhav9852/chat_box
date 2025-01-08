@@ -1,7 +1,7 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
-const persistedToken = localStorage.getItem('token');
+let persistedToken = localStorage.getItem('token');
 const persistedUser = localStorage.getItem('user');
 const persistUser = persistedUser ? JSON.parse(persistedUser) : { name: "", id: "", avatar: ""  };
 const isAuthenticated = persistedToken ? true : false;
@@ -20,13 +20,12 @@ const authSlice = createSlice({
         state.isAuthenticated = true 
         state.loginUser = action.payload.user 
         localStorage.setItem('token',JSON.stringify(action.payload.token))
-        localStorage.setItem('user',JSON.stringify(action.payload.user))
-        console.log('login auth slice',state.token, state.isAuthenticated , state.loginUser)   
+        localStorage.setItem('user',JSON.stringify(action.payload.user))  
      } ,
      logout : (state) => {
        localStorage.clear()  
-       state.isAuthenticated = false
-       console.log('logout in authslice',  state.isAuthenticated , state.token )
+       state.isAuthenticated = false 
+       state.token = '' 
      } 
     
    }
