@@ -1,4 +1,4 @@
-name: build and deploy
+name: build and deploy frontend
 on:
   push:
     branches:
@@ -17,7 +17,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
         working-directory: ./frontend
-      - name: Build Frontend
+      - name: Build Frontend   
         working-directory: ./frontend
         run: npm run build
       - name: Deploy to Netlify
