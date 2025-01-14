@@ -1,9 +1,7 @@
 const {v2} = require('cloudinary');
 
 export async function upload(url : string) {
-    const { CLOUD_NAME , API_KEY, API_SECRET} = process.env
-    console.log('CLOUD_NAME , API_KEY, API_SECRET',CLOUD_NAME , API_KEY, API_SECRET)
-    console.log('url',url) 
+    const { CLOUD_NAME , API_KEY, API_SECRET} = process.env 
     v2.config({ 
         cloud_name: CLOUD_NAME, 
         api_key: API_KEY, 
@@ -20,7 +18,7 @@ export async function upload(url : string) {
         )
     return  uploadResult.url;
     }catch(error){
-        console.log('upload fail result', error) 
+    
         throw new Error('Cloudinary upload failed');
     }
 }

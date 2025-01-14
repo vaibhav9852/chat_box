@@ -9,9 +9,9 @@ import { Prisma } from '@prisma/client';
 export const signup = async (req: any, res: Response) => {
   const { name, email, password } = req.body;
     let data =  req.files 
-    let avatar ; 
+    let avatar ;  
     if(data.avatar){ 
-      avatar  = await  upload(data.avatar[0].path)
+      avatar  = await  upload(data.avatar[0].path) 
    
      }   
 
@@ -21,19 +21,18 @@ export const signup = async (req: any, res: Response) => {
 
     if(findUser && findUser.verified){
      res.status(401).json({success:false , error: 'User already exist and verify' });
-    }
-    let user 
+    }       
+    let user  
    if(!findUser){  
 user  = await createUser({ name, email, password  ,avatar }); 
    }else{  
     user = findUser 
    }   
-  const token = generateToken({ id: user.id });
+  const token = generateToken({ id: user.id }); 
   const updatedUser = await updateUser(user.id,{verifyToken : token})
 
-  const verificationUrl = `${FRONTEND_URL}/verify-email/${token}`;
-
-
+  const verificationUrl = `${FRONTEND_URL}/verify-email/${token}`; 
+  
         const message = `Click the following link to verify your email: ${verificationUrl}`;
         try {
           await sendEmail({

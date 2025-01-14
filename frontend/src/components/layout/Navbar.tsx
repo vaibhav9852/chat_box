@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UseDispatch , useSelector} from 'react-redux';
+import {  useSelector} from 'react-redux';
 import { logout} from '../../redux/features/authentication/authSlice'
 import { useDispatch } from 'react-redux'; 
 import { Rootstate } from 'src/redux/store';
@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 // const [mobileMenuOpen, setMobileMenuOpen] = useState(false);     
   const dropdownRef = useRef<HTMLDivElement>(null); 
-  const dispatch = useDispatch()    
+  const dispatch = useDispatch()     
   const loginUser  = useSelector((state : Rootstate) => state.auth.loginUser)
   const isAuthenticated =  useSelector((state : Rootstate) => state.auth.isAuthenticated)
   const handleClickOutside = (event: MouseEvent) => {
@@ -17,7 +17,7 @@ const Navbar: React.FC = () => {
       setDropdownOpen(false);
     }
   };
-  console.log('login user', loginUser) 
+
   
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);

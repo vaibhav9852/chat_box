@@ -15,7 +15,7 @@ describe('authenticate test',()=>{
         expect((await res).body.data).toHaveProperty('id')
     })
 
-    test('signin test',async ()=>{
+    test('signin successful',async ()=>{
         let res = supertest(app).post('/auth/signup')
         .send({
             email:"vk@gmail.com",
@@ -24,45 +24,21 @@ describe('authenticate test',()=>{
         expect((await res).status).toBe(200)
         expect((await res).body).toHaveProperty('token')
         expect((await res).body.data).toHaveProperty('id')
+
+        
     })
 
-
+    test('signin fail',  ()=>{
+        describe('' , async ()=>{
+            let failRes = supertest(app).post('/auth/signup')
+            .send({
+                email:"vk@gmail.com",
+                password:"1234"
+            })
+            expect((await failRes).status).toBe(400)
+            expect((await failRes).body).toHaveProperty('status')
+        })
+    })
 
 })
 
-/*
-test('authentication successful', async () => {
-    (authenticateUser as jest.Mock).mockResolvedValue({
-        status: 200,
-        message: 'User authenticated successfully',
-        user: {
-            id: 2,
-            email: 'debasish@webkorps.com',
-            role: 'user'
-        }
-    });
-    (prisma.reaction.findMany as jest.Mock).mockResolvedValue([
-        { postId: 1, type: 'like' },
-        { postId: 2, type: 'dislike' },
-    ]
-    );
-    const result = await getMyReactionsService('valid token') as
-        { status: number; message: string; posts: { postId: number; reaction: string }[] };
-    expect(result.status).toBe(200);
-    expect(result.message).toBe('posts with reactions retrieved successfully');
-    expect(result.posts).toHaveLength(2);
-    expect(result.posts[0].postId).toBe(1);
-    expect(result.posts[0].reaction).toBe('like');
-});
-test('authentication fails', async () => {
-    (authenticateUser as jest.Mock).mockResolvedValue({
-        status: 400,
-        message: 'Invalid Credentials',
-        user: null
-    });
-    const result = await getMyReactionsService('invalid token');
-    expect(result.status).toBe(400);
-    expect(result.message).toBe('Invalid Credentials');
-});
-
-*/

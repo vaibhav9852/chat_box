@@ -1,4 +1,6 @@
 import io from "socket.io-client";
-import { URL } from "./apiConfig";
-const socket = io(`${URL}`); 
-export default socket;
+ const URL =  "http://localhost:8000"
+const socket = io(`${URL}`);  
+export default socket; 
+
+

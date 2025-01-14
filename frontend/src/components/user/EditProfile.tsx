@@ -1,22 +1,19 @@
 import { Rootstate } from "src/redux/store"
-import { useQuery } from "@tanstack/react-query"
 import { useSelector } from "react-redux"
-import { useParams } from "react-router-dom"
-import { User } from "src/types"
-import React, { useEffect, useState } from "react"
+import { User } from "src/types" 
+import React, { useEffect, useState } from "react" 
 import { isValidPassword } from "src/utils/validation"
 import { toast } from "react-toastify"
 import { editUser } from "src/services/userService" 
  
 const EditProfile = () => { 
-const {userId} = useParams()
 const [userData,setUserData] = useState<User>({name:"",email:"",password:"",avatar:undefined,id:""}) 
 const user   = useSelector((state: Rootstate)  => state.auth.loginUser ) 
 
- console.log('user..',user) 
+
 
  useEffect(() =>{
-  if(user)
+  if(user) 
   setUserData(user)   
  },[user])  
 
@@ -36,7 +33,7 @@ const handleFileChange = (e :  React.ChangeEvent<HTMLInputElement>) => {
 const handleSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
  if(userData.password?.trim() && !isValidPassword(user.password)){
-  toast.error('Invalid password',{ 
+  toast.error('Password must be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters.',{ 
     position : "top-right",
     hideProgressBar : false,
     autoClose : 5000
@@ -50,23 +47,20 @@ const handleSubmit = async (e : React.FormEvent<HTMLFormElement>) => {
   if(user.avatar){
     formData.append("avatar",user.avatar)
   }
-  console.log("Form Data Submitted:", userData);
+
   
   try{ 
    let response = await editUser(user.id , formData) 
-   console.log('updateRes...',response)  
   }catch(error){
     toast.error('Error while update profile',{  
-      position : "top-right",
-      autoClose : 5000,
-      hideProgressBar : false 
+      position : "top-right", 
+      autoClose : 5000, 
+      hideProgressBar : false  
     }) 
   }
 
 };
 
- 
-    
     return ( 
        <> 
         <div className="flex justify-center items-center h-screen bg-gray-100">

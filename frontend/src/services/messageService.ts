@@ -1,5 +1,4 @@
-import axios from "axios"
-import { URL } from "../config/apiConfig"
+// import axios from "axios" 
 import axiosInstance from "../config/api"
 
 export const sendMessage = async (formData : FormData ) =>{
@@ -10,14 +9,14 @@ export const sendMessage = async (formData : FormData ) =>{
         "Content-Type": "multipart/form-data" ,
       }, }  
   );  
-  return response.data  
+  return response.data    
 }
   
 export const fetchMessages = async (id:string) =>{ 
   if(id){
  let {data} =  await  axiosInstance.get(`/message/${id}`)  
  return data
-  }
+  } 
 }
 
 

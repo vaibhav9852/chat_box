@@ -11,5 +11,5 @@ router.get('/',authenticate , getUsers)
  
  router.patch('/:id',upload.fields([{name:'avatar',maxCount:1}]), updateUser) 
 
-export default router;      
+export default router;       
                      

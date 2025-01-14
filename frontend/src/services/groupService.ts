@@ -1,6 +1,5 @@
-import axios from "axios"
-import { URL } from "../config/apiConfig"
-import axiosInstance from "../config/api" 
+// import axios from "axios"
+import axiosInstance from "../config/api"  
 
 
 export const getUsers = async () =>{     
@@ -22,7 +21,7 @@ export const createGroup = async (data:object) =>{
 }
 
 export const exitGroup = async (groupId:string | undefined) =>{
-    return await axiosInstance.patch(`/group/${groupId}/exit`,'x' ) 
+    return await axiosInstance.patch(`/group/${groupId}/exit`)   
 }
 
 export const deleteGroup = async (groupId:string | undefined) =>{

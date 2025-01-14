@@ -32,11 +32,36 @@ import prisma from "../config/prisma";
 
  // read group message 
 
- export const readGroupMessage = async (groupId : string) =>{
-    return await prisma.message.findMany({
-        where : { groupId  },
-        orderBy: { createdAt: 'asc' },  
-    })
+ export const readGroupMessage = async (groupId : string,userId : string) =>{
+    // return await prisma.message.findMany({
+    //     where : { groupId  },
+    //     orderBy: { createdAt: 'asc' },  
+    // })
+    
+       const groupMember = await prisma.groupMember.findFirst({
+    where: { userId, groupId },
+    select: { active: true, exitedAt: true },
+  });
+
+  if (!groupMember) {
+    throw new Error('You are not a member of this group');
+  }
+  const filterCondition = groupMember?.active
+    ? {} 
+    : {
+        createdAt: {
+          lte: groupMember?.exitedAt || new Date(), 
+        },
+      };
+  return await prisma.message.findMany({
+    where: {
+      groupId,
+      ...filterCondition,
+    },
+    orderBy: { createdAt: 'asc' },  
+  });
+
+    
  }  
   
 //  export const readGroupMessage = async (groupId : string) => {

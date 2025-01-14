@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { URL } from '../../config/apiConfig';
+// import { URL } from '../../config/apiConfig';  
 import { createGroup, getUsers } from '../../services/groupService';
 import {  Member } from 'src/types';
 import { toast } from 'react-toastify';

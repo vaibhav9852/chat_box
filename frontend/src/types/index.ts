@@ -35,7 +35,7 @@ export interface SelectedItem {
     name: string;
     avatar?: string | null;
     adminId? : string  
-    members? : any
+    members? : undefined | [{userId:string , active : boolean}]
  
   } 
 
@@ -46,9 +46,10 @@ export interface ListProps {
   } 
 
 export interface MessageProps {
-  item : {   id:  string 
+    item : {   id:  string 
     adminId? : string
     name    : string 
+    members? :   [{userId:string,active:boolean}] 
   }
 } 
 
@@ -59,10 +60,9 @@ export interface Messgae{
     senderId : string
     adminId? : string
     groupId? : string
+    userId? : string 
     recipientId? : string
 }
-
-
 
   
    export interface Member {
@@ -81,3 +81,19 @@ export interface Messgae{
   export   interface ProtectedRouteProps {
     element : ReactElement
  }
+
+ export interface  userAndGroupList {
+   id : string
+   avatar? : string
+   name : string 
+
+ }
+
+ export interface ProtectedRouteProps{
+   element : React.ReactElement
+ }
+
+ export interface PublicRouteProps{
+  element : React.ReactElement
+  redirectPath? : string
+}

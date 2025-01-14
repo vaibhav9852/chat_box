@@ -13,7 +13,7 @@ const VerifyEmail: React.FC = () => {
   const dispatch = useDispatch()  
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+    e.preventDefault(); 
 
     if (!token) { 
       toast.error('Invalid or missing token.', {

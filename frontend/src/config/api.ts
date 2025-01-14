@@ -15,11 +15,10 @@ axiosInstance.interceptors.request.use((config) => {
     return config ;
 } ,
 
-(error) =>{
-    console.log('err while int', error)  
+(error) =>{ 
     return Promise.reject(error)
 }
-
+  
 )
 
 export default axiosInstance;

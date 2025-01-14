@@ -9,7 +9,7 @@ export const createGroup = async (req : Request,res : Response) =>{
      let {name , adminId, members} = req.body
      const token : any  = req.headers.authorization?.split(' ')[1];   
   
-    try{
+    try{ 
         const user = verifyToken(token)
         adminId = user.id  
       //  members = JSON.parse(members) 
@@ -45,7 +45,7 @@ export const getGroup = async (req : Request,res : Response) =>{
 export const exitGroup = async (req:Request , res:Response) =>{
   const token : any  = req.headers.authorization?.split(' ')[1];  
   const {groupId} = req.params  
-  try{
+  try{  
     const user = verifyToken(token) 
     let response = await exitFromGroup(user.id , groupId)
     res.status(200).json({success:true,data:response})
@@ -63,7 +63,6 @@ export const deleteGroup = async (req:Request , res : Response) => {
     const response = await deleteGroupService(user.id,groupId)
     res.status(200).json({sccess:true,data:response})
   }catch(error){ 
-    console.log('error...',error) 
     res.status(500).json({success:false,message:'Internal server error while delete group'})
   }
 }

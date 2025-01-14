@@ -13,27 +13,24 @@ passport.use(
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       callbackURL: process.env.GITHUB_CALLBACK_URL!,
      // callbackURL: "http://localhost:8000/auth/github/callback"
-    },
+    },  
     async (accessToken : any, refreshToken : any, profile : any, done : any) => {
-      try {
-        console.log('profile',profile)
-        
+      try { 
         let email = profile.username + '@gmail.com'
-        let name =  profile.username
-        let password = profile.nodeId
-        let avatar = profile.photos[0].value
+        let name =  profile.username 
+        let password = profile.nodeId 
+        let avatar = profile.photos[0].value 
 
           
-        let user
+        let user 
         user = await findOne({email})
     
            if(!user){
-             user = await createUser({name,email,password,avatar})
-             console.log('create user',user)
+             user = await createUser({name,email,password,avatar}) 
            }
         
          return done(null, user);
-      } catch (error) {
+      } catch (error) { 
         return done(error, null);
       }
     }

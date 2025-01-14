@@ -1,19 +1,21 @@
-import axios from "axios"
-import React, { useState } from "react"
 
+import React, { useState } from "react"
+import axiosInstance from "src/config/api"
 import { isValidEmail, isValidPassword , isValidName } from "../../utils/validation"
 import { toast } from "react-toastify" 
-import { URL } from "../../config/apiConfig" 
+// import { URL } from "../../config/apiConfig" 
 import { Link, useNavigate } from "react-router-dom"
 const Signup = () =>{
   
     const [user,setUser] = useState({name:'',email:'',password:''}) 
-    const [profileImage, setProfileImage] = useState<File | null>(null); 
-    const [loading,setLoading] = useState(false)   
+    const [profileImage, setProfileImage] = useState<File | null>(null) ; 
+    // const [loading,setLoading] = useState(false)  
+    const [errors, setErrors] = useState({name:'', email:'', password:'' });    
     
     const navigate = useNavigate()
      const handleChange = (event : React.ChangeEvent<HTMLInputElement> ) =>{
         setUser({...user,[event.target.name] : event.target.value}) 
+        setErrors({...errors,[event.target.name] :""})
      }
 
        const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,19 +37,11 @@ const Signup = () =>{
             });
         }else if(!validName){
           setUser({name:'',email:user.email , password : user.password})
-          toast.error('Name must be at least 4 characters long', {
-            position: "top-right", 
-            autoClose: 5000,
-            hideProgressBar: false,  
-        });
+         setErrors({name:'Name must be at least 4 characters long',email: errors.email,password:errors.password})
         }
         else if(!validEmail){  
-          setUser({name:user.name,email:'',password:user.password})      
-            toast.error('Invalid email', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false, 
-            });
+          setUser({name:user.name,email:'',password:user.password})
+          setErrors({name:errors.name,email:'Invalid email format.', password : errors.password})      
         }
         else if(!validPassword){ 
           setUser({name:user.name , email:user.email , password :''})
@@ -56,7 +50,7 @@ const Signup = () =>{
                 autoClose: 5000,
                 hideProgressBar: false,
             });
-        
+            setErrors({name:errors.name,email:errors.email, password:'Password must be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters.'})     
         }else{ 
       
         try{
@@ -70,10 +64,10 @@ const Signup = () =>{
                 }
           
           
-            let {data} = await axios.post(`${URL}/auth/signup`,formData,{
+            let {data} = await axiosInstance.post(`/auth/signup`,formData,{  
               headers: { "Content-Type": "multipart/form-data" }
             }) 
-          
+           
             if(data.success){
               toast.success(data.message,{
                 position: 'top-right',
@@ -82,6 +76,7 @@ const Signup = () =>{
               })
               setUser({name: '',email:'',password:''})
             }
+            navigate('/login')
         }catch(error){
             toast.error('Error while signup',{
               position : 'top-right',
@@ -115,6 +110,7 @@ const Signup = () =>{
               required
               className="w-full mt-2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
+             {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
           <div className="mb-4">
             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -129,6 +125,7 @@ const Signup = () =>{
               required
               className="w-full mt-2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
+             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
           <div className="mb-6">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -143,6 +140,7 @@ const Signup = () =>{
               required
               className="w-full mt-2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
+             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div> 
           <div className="mb-6">
              <label htmlFor="profileImage" className="block text-sm font-medium text-gray-700">

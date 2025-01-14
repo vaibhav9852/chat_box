@@ -1,6 +1,5 @@
-import axios from "axios";
-import { URL } from "../config/apiConfig";
-import axiosInstance from "../config/api";
+// import axios from "axios";
+import axiosInstance from "../config/api"; 
 
 
 export const loginUser   = async (credentials: { email: string; password: string }) => {
@@ -29,8 +28,7 @@ export const forgotPassword = async (data:object) =>{
 } 
 
 export const resetPassword = async (token:string,data:object) => {
-  const response = await axiosInstance.post(`/auth/reset-password/${token}`,data)
-  console.log('response resetPassword', response)   
+  const response = await axiosInstance.post(`/auth/reset-password/${token}`,data) 
   return response.data  
 }
 

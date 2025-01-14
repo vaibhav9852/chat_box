@@ -1,4 +1,4 @@
-import bcrypt,{} from 'bcrypt';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '10', 10);
@@ -19,9 +19,8 @@ export const generateToken = (payload: object, time = '1d'): string => {
 
 export const verifyToken =  (token : string) : any  => {
   try{
-    console.log('verify fun',token , JWT_SECRET) 
   return   jwt.verify(token, JWT_SECRET);
   }catch(error){
-    console.log('error on verification...',error)       
+    throw new Error('Something wrong while verify token.')     
   } 
 };

@@ -9,11 +9,10 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
      res.status(401).json({ error: 'Unauthorized' });
   }
   try { 
-    // const payload = verifyToken(token);
-    // console.log('Payload --', payload);
-    // req.user = payload;  
+    
     next();    
   } catch (err) { 
      res.status(401).json({ error: 'Invalid token' }); 
   }
 };
+

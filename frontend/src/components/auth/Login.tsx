@@ -1,27 +1,28 @@
-import axios from "axios"
+
 import React, { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { isValidEmail, isValidPassword } from "../../utils/validation"
-import { toast } from "react-toastify"
-import { URL } from "../../config/apiConfig"
-import { Link, useNavigate } from "react-router-dom"
-import { githubLogin, loginUser } from "src/services/userService"
+import { toast } from "react-toastify" 
+
+import { Link, useNavigate } from "react-router-dom" 
+import {  loginUser } from "src/services/userService"
  import {login} from "../../redux/features/authentication/authSlice"
-import { Rootstate } from "src/redux/store"
+// import { Rootstate } from "src/redux/store"
 
 const Login = () =>{ 
-  
-    const [user,setUser] = useState({email:'',password:''})     
+    const [user,setUser] = useState({email:'',password:''})  
+    const [errors, setErrors] = useState({ email: '', password: '' });   
     const [loading,setLoading] = useState(false) 
     
      const dispatch = useDispatch()
-     const isAuthenticated = useSelector((state: Rootstate) => state.auth.isAuthenticated)
+     //const isAuthenticated = useSelector((state: Rootstate) => state.auth.isAuthenticated)
      const navigate = useNavigate() 
 
      const handleChange = (event : React.ChangeEvent<HTMLInputElement> ) =>{
         setUser({...user,[event.target.name] : event.target.value}) 
-     }
-
+        setErrors({ ...errors, [event.target.name]: "" });
+     }  
+               
      useEffect(() => {
        const queryParams = new URLSearchParams(window.location.search); 
        const userData = queryParams.get('user');     
@@ -40,7 +41,7 @@ const Login = () =>{
           
          }   
        }   
-     }, [loading]);    
+     }, [loading , dispatch, navigate]);    
      
       
      const handleSubmit = async (event : React.FormEvent<HTMLFormElement>) => {
@@ -56,19 +57,11 @@ const Login = () =>{
             }); 
         }else if(!validEmail){
           setUser({email:'' , password : user.password}) 
-            toast.error('Invalid email', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-            });
+          setErrors({email:'Invalid email format.', password : errors.password})
         }
         else if(!validPassword){
-          setUser({email:user.email , password : ''})
-            toast.error('Password must be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters.', {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-            }); 
+          setUser({email:user.email , password : ''}) 
+            setErrors({email:errors.email,password:'Password must be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters.'})
         }else{
         try{     
             let data = await loginUser(user) 
@@ -81,6 +74,7 @@ const Login = () =>{
                 hideProgressBar : false
               })  
               setUser({email:'',password:''})
+              
               navigate('/chat') 
             }
         }catch(error){
@@ -96,19 +90,21 @@ const Login = () =>{
         setLoading(false)  
      }
 
-     const handleGithubLogin = async (event: React.FormEvent<HTMLElement>) =>{
-             event.preventDefault()
-             setLoading(true) 
-       try{ 
-          const data  = await  githubLogin()  
-       }catch(error){ 
-        toast.error('Oops login failed', {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false, 
-        }); 
-       }
-     }
+    //  const handleGithubLogin = async (event: React.FormEvent<HTMLElement>) =>{
+    //          event.preventDefault() 
+    //          setLoading(true)  
+    //    try{ 
+    //     //  const data  = 
+    //        await  githubLogin()  
+
+    //    }catch(error){ 
+    //     toast.error('Oops login failed', {
+    //         position: "top-right",
+    //         autoClose: 5000,
+    //         hideProgressBar: false, 
+    //     }); 
+    //    }
+    //  }
 
     return(
         <>
@@ -130,6 +126,7 @@ const Login = () =>{
               required
               className="w-full mt-2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
+           {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
           <div className="mb-6">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -144,6 +141,7 @@ const Login = () =>{
               required
               className="w-full mt-2 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
+             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
           <Link to="/forgot-password"> <p className=" font-semibold text-sm pt-2 mb-4">Forgot password</p></Link>
           <button

@@ -1,42 +1,45 @@
 
 import prisma from "../config/prisma";
-
-interface GroupData{
-    name : string
-    adminId : string
-    members : string[]
-}
-
+import { GroupData } from "../types";
 
 
 export const createNewGroup = async ({ name, adminId, members }: GroupData) => {
-  console.log('recived data...',{ name, adminId, members })
+
   return await prisma.group.create({
     data: {
       name,
       adminId,
       members: {
-        connect: members.map((id) => ({ id })) 
-      }
-    }
+        create: [
+          ...members.map((id) => ({
+            userId : id,
+          })),
+          {
+            userId: adminId, // Ensure the admin is also added as a member
+          },
+        ],
+      },
+    },
+    include: {
+      members: {
+        include: {
+          user: true, // Fetch user details of members
+        },
+      },
+    },
   });
 };
 
 
 export const getAllGroup = async (userId : string) =>{
-  return await prisma.group.findMany({
-    where : {
-      OR: [
-        { adminId: userId }, 
-        { members: { some: { id: userId } } }, 
-      ],
-    },
-    include: {
-      members: true, 
-      messages: true, 
-    },
-    }
-)} 
+
+
+  const groups =  await prisma.groupMember.findMany({
+    where : {userId},
+    include : {group : {include : { admin : true , members : { include : { user : true}}}}}
+  })
+return groups.map((groupMember) => groupMember.group )
+} 
 
 
 export const getGroupDeatils = async (groupId : string) =>{
@@ -50,58 +53,58 @@ export const getGroupDeatils = async (groupId : string) =>{
     })
 }
 
-/*
- // Create the group with the provided admin and members
-    const newGroup = await prisma.group.create({
-      data: {
-        name,
-        adminId,
-        admin: { connect: { id: adminId } },  // Connect the admin user
-        members: { connect: memberIds.map(id => ({ id })) },  // Connect the members by their user IDs
-      },
+export const exitFromGroup = async (userId : string , groupId: string) =>{
+    const groupMember = await prisma.groupMember.findFirst({
+      where : {userId , groupId}
+    })
+
+    if(!groupMember){
+      throw new Error('You are not a member of this group')
+    }
+
+    await prisma.groupMember.update({
+      where : { id : groupMember.id},
+      data : {active : false , exitedAt : new Date()}  
+    })
+ return { message: 'You have exited the group'}
+}
+
+
+
+export const deleteGroupService = async (userId: string, groupId: string) => {
+  const group = await prisma.group.findUnique({
+    where: { id: groupId },
+    include: { admin: true },
+  });
+
+
+  if (!group) {
+    throw new Error('Group not found');
+  }
+
+  if (group.adminId === userId) { 
+    await prisma.group.delete({
+      where: { id: groupId },
     });
 
-    res.status(201).json({ message: 'Group created successfully', group: newGroup });
+    return { message: 'Group has been deleted permanently' };
+  } else {
+   
+    const groupMember = await prisma.groupMember.findFirst({
+      where: { groupId, userId },
+    });
 
-    const updatedGroup = await prisma.group.update({
-      where: { id: groupId },
-      data: {
-        members: {
-          connect: memberIds.map(id => ({ id })),  // Connect the new members
-        },
-      },
+    if (!groupMember) {
+      console.error('User is not a member of the group');
+      throw new Error('You are not a member of this group');
+    }
+
+ 
+    await prisma.groupMember.delete({
+      where: { id: groupMember.id },
     });
     
-  } catch (error) {
-    console.error('Error creating group:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-*/
-
-/*
-import prisma from "../config/prisma"; // Prisma instance
-
-export const getGroupsByUserId = async (userId: string) => {
-  try {
-    const groups = await prisma.group.findMany({
-      where: {
-        OR: [
-          { adminId: userId }, // Fetch groups where the user is the admin
-          { members: { some: { id: userId } } }, // Fetch groups where the user is a member
-        ],
-      },
-      include: {
-        members: true, // Include group members if needed
-        messages: true, // Include messages if needed
-      },
-    });
-    return groups;
-  } catch (error) {
-    console.error("Error fetching groups:", error);
-    throw new Error("Could not fetch groups");
-  }
+    return { message: 'You have been removed from the group' };  
+  } 
 };
 
-
-*/

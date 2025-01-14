@@ -15,5 +15,5 @@ router.patch('/:groupId/exit',exitGroup)
 router.delete('/:groupId',deleteGroup)  
 
 // model casacade delete
-
-export default router ;   
+ 
+export default router ;    

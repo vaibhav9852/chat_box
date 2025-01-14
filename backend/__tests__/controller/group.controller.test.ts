@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import app from "../../src/app";
 
+
  describe('group test',()=>{
 
     test('create group test',async () =>{
@@ -16,4 +17,11 @@ import app from "../../src/app";
         expect((await res).body.data).toHaveProperty('data')
         
     })
+
+    test('test get all group',async () =>{
+
+        const res = await supertest(app).post('/group')
+        expect(res.body.data.length).toBe(1)
+    })
+
  })
